@@ -43,6 +43,13 @@ COLUMN_MAP = {
 
 
 def load_raw_csv(csv_path: str) -> pd.DataFrame:
+
+    df = pd.read_csv(csv_path)
+    df = df.rename(columns=COLUMN_MAP)
+    df["total_charges"] = pd.to_numeric(df["total_charges"], errors="coerce")
+    df = df[df["total_charges"].notna()]
+
+
     """Load the raw IBM Telco churn CSV into a DataFrame, cleaned and
     rename-mapped to match `raw_customers` in sql/schema.sql.
 
