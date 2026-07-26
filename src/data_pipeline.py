@@ -48,7 +48,29 @@ def load_raw_csv(csv_path: str) -> pd.DataFrame:
     df = df.rename(columns=COLUMN_MAP)
     df["total_charges"] = pd.to_numeric(df["total_charges"], errors="coerce")
     df = df[df["total_charges"].notna()]
+    yes_no = {"Yes": True, "No": False}
+    df["partner"] = df["partner"].map(yes_no)
+    df["dependents"] = df["dependents"].map(yes_no)
+    df["phone_service"] = df["phone_service"].map(yes_no)
+    df["paperless_billing"] = df["paperless_billing"].map(yes_no)
+    df["churned"] = df["churned"].map(yes_no)
+    df["multiple_lines"] = df["multiple_lines"].replace({"No phone service": False, "Yes": True, "No": False})
 
+    df["online_security"] = df["online_security"].replace({"No internet service": False, "Yes": True, "No": False})
+    df["online_backup"] = df["online_backup"].replace({"No internet service": False, "Yes": True, "No": False})
+    df["device_protection"] = df["device_protection"].replace({"No internet service": False, "Yes": True, "No": False})
+    df["tech_support"] = df["tech_support"].replace({"No internet service": False, "Yes": True, "No": False})
+    df["streaming_tv"] = df["streaming_tv"].replace({"No internet service": False, "Yes": True, "No": False})
+    df["streaming_movies"] = df["streaming_movies"].replace({"No internet service": False, "Yes": True, "No": False})
+
+    internet_service_map = {
+        "DSL": "DSL",
+        "Fiber optic": "Fiber optic",
+        "No": "No internet service"
+    }
+    df["internet_service"] = df["internet_service"].replace(internet_service_map)
+
+    return df
 
     """Load the raw IBM Telco churn CSV into a DataFrame, cleaned and
     rename-mapped to match `raw_customers` in sql/schema.sql.
@@ -91,7 +113,7 @@ def load_raw_csv(csv_path: str) -> pd.DataFrame:
     5. Return the cleaned, renamed DataFrame -- don't write to the DB here,
        that's write_to_db's job. Keep these functions doing one thing each.
     """
-    raise NotImplementedError("TODO: implement CSV loading + cleaning")
+
 
 
 def write_to_db(df: pd.DataFrame, table_name: str = "raw_customers") -> None:
@@ -102,7 +124,7 @@ def write_to_db(df: pd.DataFrame, table_name: str = "raw_customers") -> None:
     pipeline (hint: what if the table has downstream consumers, indexes,
     or you want incremental loads instead of full reloads?).
     """
-    raise NotImplementedError("TODO: implement DB write via sqlalchemy engine")
+
 
 
 def get_feature_table() -> pd.DataFrame:
@@ -112,7 +134,7 @@ def get_feature_table() -> pd.DataFrame:
     TODO: implement. This should be the ONLY place `train.py` reads
     features from -- train.py should never touch raw_customers directly.
     """
-    raise NotImplementedError("TODO: implement feature query")
+
 
 
 if __name__ == "__main__":
