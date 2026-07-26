@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run test suite
+        run: pytest tests/ -v
+
+      # TODO: this pipeline currently only runs data-fixture tests, since
+      # test_model_performance.py depends on a real DB connection via
+      # src/train.py -> src/data_pipeline.py. Once that's implemented,
+      # either:
+      #   (a) spin up a postgres service container in this workflow
+      #       (services: postgres: image: postgres:16 ...), or
+      #   (b) mock get_feature_table() in the performance test so CI
+      #       doesn't need a live database.
+      # Decide which, and justify it in a comment here -- this is a real
+      # design decision MLOps engineers make constantly.
